@@ -1,0 +1,308 @@
+// Created by moamen on 2/28/2026.
+#ifndef UNI_TEMP_LINKED_LIST_H
+#define UNI_TEMP_LINKED_LIST_H
+
+#include <iostream>
+using namespace std;
+
+template<class t>
+class Linked_List {
+    struct Node {
+        t val;
+        Node *next;
+
+        Node(t x) : val(x) , next(nullptr) {}
+    };
+    int cnt;
+    Node *first , *last;
+
+    public:
+    Linked_List() {
+        cnt = 0;
+        first = last = nullptr;
+    }
+
+    bool is_empty() {
+        return cnt == 0;
+    }
+
+    int size() {
+        return cnt;
+    }
+
+    void insert_in_front(t x) {
+        Node *Newnode = new Node(x);
+
+
+        if (is_empty()) first = last = Newnode;
+        else {
+            Newnode -> next = first;
+            first = Newnode;
+        }
+        cnt++;
+    }
+
+    void insert_in_back(t x) {
+        Node *Newnode = new Node(x);
+
+        if (is_empty()) first = last = Newnode;
+        else {
+            last -> next = Newnode;
+            last = Newnode;
+        }
+        cnt++;
+    }
+
+    void delete_from_front() {
+        if (is_empty()) {
+            cout << "Error! There is no element to delete ):\n";
+            return;
+        }
+        Node *tmp = first;
+        first = first -> next;
+        delete tmp;
+        cnt--;
+        if (is_empty()) last = nullptr;
+    }
+
+    void delete_from_back() {
+        if (is_empty()) {
+            cout << "Error! There is no element to delete ):\n";
+            return;
+        }
+
+        if (size() == 1) {
+            Node *tmp = first;
+            first = last = nullptr;
+            delete tmp;
+            cnt--;
+            return;
+        }
+
+
+        Node *tmp , *cur = first;
+        // cur ==> to determine the before last node which will be the last node after deletion
+        // tmp ==> to determine the last node which will be deleted
+        while (cur -> next != nullptr && cur -> next -> next != nullptr ) {
+            cur = cur -> next;
+        }
+        tmp = cur -> next;
+        cur -> next = nullptr;
+        last = cur;
+        delete tmp;
+        cnt--;
+    }
+
+    void insert_at_pos(int idx , t val) {
+        if (idx < 1 || idx > size() + 1) return void(cout << "This index is out of the list boundaries ): \n");
+
+        if (idx == 1) return void (insert_in_front(val));
+        if (idx == size() + 1) return void (insert_in_back(val));
+
+        Node *Newnode = new Node(val);
+        Node *cur = first;
+        int pos = 1;
+
+        while (true) {
+            if (pos == idx - 1) break;
+            cur = cur -> next ;
+            pos++;
+        }
+
+        Newnode -> next = cur -> next;
+        cur -> next = Newnode;
+        cnt++;
+    }
+
+    void delete_at_pos(int idx) {
+        if (idx < 1 || idx > size()) return void(cout << "This index is out of the list boundaries ): \n");
+
+        if (idx == 1) return void (delete_from_front());
+        if (idx == size()) return void (delete_from_back());
+
+        Node *cur = first;
+        int pos = 1;
+
+        while (true) {
+            if (pos == idx - 1) break;
+            cur = cur -> next ;
+            pos++;
+        }
+
+        Node *del = cur -> next;
+        cur -> next = del -> next;
+
+        delete del;
+        cnt--;
+    }
+
+    void edit_the_nth_element(int idx , t x) {
+        if (idx > size() || idx < 1) return void (cout << "This index is out of the list boundaries ): \n");
+
+        int pos = 1 ;
+        Node *cur = first;
+        while (true) {
+            if (pos == idx) {
+                cur -> val = x;
+                return ;
+            }
+            cur = cur -> next ;
+            pos++;
+        }
+    }
+
+    void get_the_nth_element(int idx , t &x , bool &ch) {
+        if (idx > size() || idx < 1) {
+            cout << "This index is out of the list boundaries ): \n";
+            ch = false;
+            return;
+        }
+
+        ch = true;
+        int pos = 1 ;
+        Node *cur = first;
+        while (true) {
+            if (pos == idx) {
+                x = cur ->  val;
+                return ;
+            }
+            cur = cur -> next ;
+            pos++;
+        }
+
+    }
+
+    void merge_with_another_list(Linked_List<t> &l1) {
+        if (l1.is_empty()) return;
+        if (is_empty()) {
+            first = l1.first;
+            last = l1.last;
+            cnt = l1.cnt;
+
+            l1.first = l1.last = nullptr;
+            l1.cnt = 0;
+            return;
+        }
+        last -> next = l1.first;
+        last = l1.last;
+        cnt += l1.cnt;
+        l1.first = l1.last = nullptr;
+        l1.cnt = 0;
+    }
+
+    void merge_with_another_list_sorted(Linked_List<t> &l1) {
+        if (l1.is_empty()) return;
+        if (is_empty()) {
+            first = l1.first;
+            last = l1.last;
+            cnt = l1.cnt;
+
+            l1.first = l1.last = nullptr;
+            l1.cnt = 0;
+            return;
+        }
+
+        Node *f1 = first, *f2 = l1.first , *cur = nullptr;
+
+        if (f1->val <= f2->val) {
+            cur = f1;
+            f1 = f1->next;
+        }
+        else {
+            first = cur = f2;
+            f2 = f2->next;
+        }
+
+        while (f1 != nullptr && f2 != nullptr) {
+            if (f1->val <= f2->val) {
+                cur->next = f1;
+                cur = f1;
+                f1 = f1->next;
+            }
+            else {
+                cur->next = f2;
+                cur = f2;
+                f2 = f2->next;
+            }
+        }
+
+        if (f1 != nullptr) cur->next = f1;
+        else if (f2 != nullptr) {
+            cur->next = f2;
+            last = l1.last;
+        }
+
+        cnt += l1.cnt;
+
+        l1.first = l1.last = nullptr;
+        l1.cnt = 0;
+    }
+
+    void reverse() {
+        if (size() == 1 || is_empty()) return;
+        Node *tmp1 = first , *tmp2 = first -> next , *cur = first -> next;
+
+        while (cur -> next != nullptr) {
+            tmp2 = cur -> next;
+            cur -> next = tmp1;
+            tmp1 = cur;
+            cur = tmp2;
+        }
+        cur -> next = tmp1;
+        first -> next = nullptr;
+        swap(first , last);
+    }
+
+    void exists(t target) {
+        Node *cur = first;
+
+        while (cur != nullptr) {
+            if (cur->val == target) return void(cout << "Element Is found");
+            cur = cur->next;
+        }
+        cout << "Element not found \n";
+    }
+
+    void print() {
+        if (is_empty()) return void (cout << "{}\n");
+        Node *cur = first;
+        cout << "{";
+        while (cur -> next != nullptr) {
+            cout << cur->val << " , " ;
+            cur = cur -> next;
+        }
+        cout << cur->val << "}\n" ;
+    }
+
+    void print1() { // print with while loop
+        if (is_empty()) return void (cout << "{}\n");
+        cout << "Printing Linked list Elements with While loop : \n{";
+        Node *cur = first;
+        while (cur -> next != nullptr) {
+            cout << cur->val << " , " ;
+            cur = cur -> next;
+        }
+        cout << cur->val << "}\n" ;
+    }
+
+    void print2() { // print with for loop
+        if (is_empty()) return void (cout << "{}\n");
+        cout << "Printing Linked list Elements with For loop : \n{";
+        Node *cur = first;
+
+        for (int i = 0 ; i < size()-1 ; i++ ) {
+            cout << cur->val << " , " ;
+            cur = cur -> next;
+        }
+        cout << cur->val << "}\n" ;
+    }
+
+    void clear() {
+        while(!is_empty()) delete_from_front();
+    }
+    ~Linked_List() {
+        clear();
+    }
+
+};
+#endif //UNI_TEMP_LINKED_LIST_H

@@ -1,0 +1,96 @@
+#ifndef UNI_TEMP_STACK_H
+#define UNI_TEMP_STACK_H
+
+#include <iostream>
+using namespace std;
+template<class t>
+class Stack {
+    struct Node {
+        t value;
+        Node *prev;
+        Node(t x) : prev(nullptr), value(x) {}
+    };
+    Node *top ;
+    int cnt ;
+
+public:
+
+    Stack() : top(nullptr), cnt(0) {}
+
+    int size() {
+        return cnt;
+    }
+
+    bool is_empty() {
+        return cnt == 0;
+    }
+
+    void push(t x) {
+        Node *new_node = new Node(x);
+        if (top == nullptr) top = new_node;
+        else {
+            new_node->prev = top;
+            top = new_node;
+        }
+        cnt++;
+    }
+
+    void pop() {
+        if (top == nullptr) return;
+        Node *del = top;
+        top = top->prev;
+        delete del;
+        cnt--;
+    }
+
+    void get_top(t &x , bool &ch) {
+        if (is_empty()) {
+            ch = false;
+            return void (cout << "Stack is Empty!\n");
+        }
+        ch = true;
+        x = top->value;
+    }
+
+    t peek() {
+        return top->value;
+    }
+
+    void reverse() {
+        if (cnt <= 1) return;
+        Node *current = top;
+        Node *next_node = nullptr;
+        Node *previous_node = nullptr;
+
+        while (current != nullptr) {
+            next_node = current->prev;
+            current->prev = previous_node;
+            previous_node = current;
+            current = next_node;
+        }
+
+        top = previous_node;
+    }
+
+    void print() {
+        Node *cur = top;
+        cout << "The stack elements : [ ";
+        while (cur != nullptr) {
+            cout << cur->value;
+            cur = cur->prev;
+            if (cur != nullptr) cout << " , ";
+        }
+        cout << " ]" << endl;
+    }
+
+    void clear() {
+        while (!is_empty()) pop();
+    }
+
+    ~Stack() {
+        clear();
+    }
+};
+
+
+#endif //UNI_TEMP_STACK_H

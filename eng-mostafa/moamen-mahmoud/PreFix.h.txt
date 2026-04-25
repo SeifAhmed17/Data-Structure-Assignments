@@ -1,0 +1,98 @@
+//
+// Created by moamen on 4/18/2026.
+//
+
+#ifndef UNI_TEMP_PREFIX_H
+#define UNI_TEMP_PREFIX_H
+#define all(x) (x).begin(), (x).end()
+
+class PreFix {
+public:
+bool IsOperand(char c) {
+    return (c >= '0' && c <= '9');
+}
+bool IsOperator(char c) {
+    return c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
+}
+
+int precedence(char op) {
+    if (op == '+' || op == '-') return 1;
+    if (op == '*' || op == '/') return 2;
+    if (op == '^') return 3;
+    return 0;
+}
+
+string InfixToPrefix(string infix) {
+    Stack<char> st;
+    string prefix = "";
+
+    reverse(all(infix));
+
+    for (int i = 0; i < infix.length(); i++) {
+        if (infix[i] == '(') infix[i] = ')';
+        else if (infix[i] == ')') infix[i] = '(';
+    }
+
+    for (int i = 0; i < infix.length(); i++) {
+        char c = infix[i];
+        if (IsOperand(c)) prefix += c;
+        else if (c == '(') st.push(c);
+        else if (c == ')') {
+            while (!st.is_empty() && st.peek() != '(') {
+                prefix += st.peek();
+                st.pop();
+            }
+            st.pop();
+        }
+        else if (IsOperator(c)) {
+            while (!st.is_empty() && precedence(st.peek()) > precedence(c)) {
+                prefix += st.peek();
+                st.pop();
+            }
+            while (!st.is_empty() && precedence(st.peek()) == precedence(c) && c == '^') {
+                prefix += st.peek();
+                st.pop();
+            }
+            st.push(c);
+        }
+    }
+
+    while (!st.is_empty()) {
+        prefix += st.peek();
+        st.pop();
+    }
+    reverse(all(prefix));
+    return prefix;
+}
+
+int evaluatePrefix(string prefix) {
+    Stack<int> st;
+
+    for (int i = prefix.length() - 1; i >= 0; i--) {
+        char c = prefix[i];
+
+        if (IsOperand(c)) {
+            st.push(c - '0');
+        }
+        else if (IsOperator(c)) {
+            int op1 = st.peek();
+            st.pop();
+            int op2 = st.peek();
+            st.pop();
+
+            if (c == '+') st.push(op1 + op2);
+            else if (c == '-') st.push(op1 - op2);
+            else if (c == '*') st.push(op1 * op2);
+            else if (c == '/') st.push(op1 / op2);
+
+        }
+    }
+    int ans = st.peek();
+    st.pop();
+    return ans;
+}
+
+};
+
+
+#endif //UNI_TEMP_PREFIX_H

@@ -1,0 +1,50 @@
+//
+// Created by moamen on 4/18/2026.
+//
+
+#ifndef UNI_TEMP_QUEUEUSINGSTACKS_H
+#define UNI_TEMP_QUEUEUSINGSTACKS_H
+
+
+template <typename T>
+class QueueUsingStacks {
+private:
+    Stack<T> s1;
+    Stack<T> s2;
+    int added_elements;
+
+public:
+    QueueUsingStacks() : added_elements(0) {}
+
+    void enqueue(T value) {
+        s1.push(value);
+        added_elements++;
+    }
+
+    T dequeue() {
+        if (s1.is_empty() && s2.is_empty()) {
+            cout << "Queue is Empty!" << endl;
+            return T();
+        }
+
+        if (s2.is_empty()) {
+            while (!s1.is_empty()) {
+                s2.push(s1.peek());
+                s1.pop();
+            }
+        }
+
+        T value = s2.peek();
+        s2.pop();
+        added_elements--;
+
+        return value;
+    }
+
+    bool is_empty() {
+        return added_elements == 0;
+    }
+};
+
+
+#endif //UNI_TEMP_QUEUEUSINGSTACKS_H

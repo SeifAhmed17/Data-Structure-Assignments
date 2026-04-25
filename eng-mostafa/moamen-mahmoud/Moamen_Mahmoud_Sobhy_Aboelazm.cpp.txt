@@ -1,0 +1,175 @@
+//                                                  بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ
+// El_Mooo ==> 1 (^_^)
+#include <iostream>
+#include <algorithm>
+#include "Linked_List.h"
+#include "Doubly_Linked_List.h"
+#include "Stack.h"
+#include "QueueUsingStacks.h"
+#include "PreFix.h"
+#include "Stack_arr.h"
+using namespace std;
+#define all(x) (x).begin(), (x).end();
+/*============================================================================*/
+
+void Task1() { // Get n_th item
+    Linked_List<int> list;
+    for (int i = 1; i <= 10; i++) list.insert_in_back(i);
+    int n ; bool ch ;
+    list.get_the_nth_element(5,n,ch);
+    if (ch) cout << n << endl;
+    else cout << "There is no elements in this index!" << endl;
+}
+
+void Task2() { // Merge Two Sorted Lists
+    Linked_List<int> list1;
+    for (int i = 1; i <= 10; i++) list1.insert_in_back(i);
+    Linked_List<int> list2;
+    for (int i = 11; i <= 20; i++) list2.insert_in_back(i);
+
+    list1.merge_with_another_list_sorted(list2);
+
+    list1.print();
+}
+
+void Task3() { // Reverse linked list
+    Linked_List<int> list;
+    for (int i = 1; i <= 10; i++) list.insert_in_back(i);
+    list.reverse();
+    list.print();
+}
+
+void Task4() { // Delete at Position
+    Linked_List<int> list;
+    for (int i = 1; i <= 10; i++) list.insert_in_back(i);
+    list.delete_at_pos(4);
+    list.print();
+}
+
+void Task5() { // Reverse number using stack
+    int number = 123456 ; // cin >> number;
+    Stack<int> stack;
+    while (number) {
+        stack.push(number % 10);
+        number /= 10;
+    }
+
+    int k = 1;
+    while (!stack.is_empty()) {
+        number += stack.peek()*k;
+        k *= 10;
+        stack.pop();
+    }
+    cout << number << endl;
+}
+
+void Task6() { // Valid Parentheses
+    string word = "{[()]}";  cin >> word;
+    Stack<char> stack;
+
+    for (char c : word) {
+        if (c == '{' || c == '(' || c == '[') stack.push(c);
+        else {
+            char top = stack.peek();
+
+            if ( (c == '}' && top == '{') || (c == ']' && top == '[') || (c == ')' && top == '(') ) stack.pop();
+            else return void (cout << "The Word is Invalid!");
+        }
+    }
+    cout << "The Word is Valid!" << endl;
+}
+
+void Task7() { // Removing Stars
+    string s ; cin >> s; Stack_arr<char>st(s.length());
+    for (int i = 0; i < s.length(); i++) {
+        if (s[i] == '*') st.pop();
+        else st.push(s[i]);
+    }
+    Stack_arr<char>tmp(s.length());
+    char c ; bool ch;
+    while (!st.is_empty()) {
+        st.peak(c,ch);
+        tmp.push(c);
+        st.pop();
+    }
+    while (!tmp.is_empty()) {
+        tmp.peak(c,ch);
+        cout << c;
+        tmp.pop();
+    }
+}
+
+void Task8() { // Remove Duplicates
+    int n = 7; // cin >> n;
+    Stack<int> st;
+    for (int i = 1; i <= n; i++) {
+        int x ; cin >> x;
+        if (i == 1) st.push(x);
+        if (i > 1 && st.peek() != x) st.push(x);
+    }
+    Stack<int> tmp;
+    while (!st.is_empty()) {
+        tmp.push(st.peek());
+        st.pop();
+    }
+    while (!tmp.is_empty()) {
+        cout << tmp.peek() << " ";
+        tmp.pop();
+    }
+}
+
+void Task9() { // Check if number exist
+    Linked_List<int>list;
+    for (int i = 1; i <= 10; i++) list.insert_in_back(i);
+    list.exists(4);
+    list.exists(16);
+}
+
+void Task10() { // Check if palindrome
+    Stack<int> st1,st2 , tmp;
+    tmp.push(1);
+    tmp.push(2);
+    tmp.push(3);
+    tmp.push(2);
+    tmp.push(1);
+
+    while (!tmp.is_empty()) {
+        st2.push(tmp.peek());
+        st1.push(tmp.peek());
+        tmp.pop();
+    }
+
+    st2.reverse();
+
+    while (!st2.is_empty()) {
+        if ( st2.peek() != st1.peek()) return void (cout << "No Palindrome");
+        st1.pop();
+        st2.pop();
+    }
+
+    cout << "Palindrome";
+}
+
+void Task11() { // Rotate the linked list by k positions
+    Linked_List<int>list;
+    for (int i = 1; i <= 5; i++) list.insert_in_back(i);
+    int k = 2 ; // cin >> k;
+
+    while (k--) {
+        int n ; bool ch;
+        list.get_the_nth_element(1,n,ch);
+        list.insert_in_back(n);
+        list.delete_from_front();
+    }
+
+    list.print();
+}
+
+
+
+int main() {
+    // elmooo();
+    Task10();
+
+    return 0;
+}
