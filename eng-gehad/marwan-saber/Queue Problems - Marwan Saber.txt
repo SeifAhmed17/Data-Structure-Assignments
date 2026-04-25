@@ -1,0 +1,234 @@
+#include <bits/stdc++.h>
+#include <ctime>
+#include<ext/pb_ds/assoc_container.hpp>
+#include <bit>
+#include <cstdint>
+#include <cstdlib>
+#include <windows.h>
+#pragma warning(disable : 4996)
+#include<ext/pb_ds/assoc_container.hpp>
+using namespace __gnu_pbds;
+using namespace std;
+#define int long long
+#define endl '\n'
+typedef tree<int, null_type, less<int>, rb_tree_tag, tree_order_statistics_node_update> orderedset;
+typedef tree<int,null_type,less_equal<int>,rb_tree_tag,tree_order_statistics_node_update>orderdmultiset;
+void fast() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+}
+class Stack {
+    int top=-1;
+    int size=100;
+    char arr[100];
+
+public:
+    bool is_empty() {
+        return top==-1;
+    }
+    bool is_full() {
+        return top==size-1;
+    }
+    void push(char x) {
+        if(is_full()) {
+            cout<<"Stack Overflow"<<endl;
+            return;
+        }
+        arr[++top]=x;
+    }
+    int pop() {
+        if (is_empty()) {
+            cout<<"Stack Underflow"<<endl;
+            return -1;
+        }
+        return --top;
+    }
+    int peek() {
+        if (is_empty()) {
+            return -1;
+        }
+        return arr[top];
+    }
+    void display() {
+        for (int i=top;i>=0;i--) {
+            cout<<arr[i]<<" ";
+        }
+        cout<<endl;
+    }
+
+
+};
+
+class Queue {
+Stack inbox, outbox;
+    int size=0;
+    void Transfer() {
+        while (!inbox.is_empty()) {
+            outbox.push(inbox.peek());
+            inbox.pop();
+        }
+
+    }
+public:
+    void enqueue(int x) {
+        if (inbox.is_full()) {
+            cout<<"Queue Overflow"<<endl;
+            return;
+        }
+        inbox.push(x);
+        size++;
+    }
+    int dequeue() {
+        if (outbox.is_empty()) {
+            if (inbox.is_empty()) {
+                cout<<"Queue Underflow"<<endl;
+                return -1;
+            }
+            else {
+                Transfer();
+            }
+        }
+            int val=outbox.peek();
+            outbox.pop();
+            size--;
+            return val;
+
+    }
+    int peek() {
+        if (outbox.is_empty()) {
+            if (inbox.is_empty()) {
+                cout<<"Queue Underflow"<<endl;
+                return -1;
+            }
+            else {
+                Transfer();
+            }
+        }
+
+        return outbox.peek();
+
+    }
+    bool isEmpty() {
+            return inbox.is_empty() and outbox.is_empty();
+        }
+
+};
+
+
+// queue in linked list implenment
+struct Node {
+    int data;
+    Node* next;
+
+    Node(int value) {
+        data = value;
+        next = NULL;
+    }
+};
+class queueLinkedList {
+    Node *head, *tail;
+    public:
+    queueLinkedList() {
+         head = NULL;
+        tail = NULL;
+    }
+    bool isEmpty() {
+        return head==NULL;
+    }
+    void enqueue(int x) {
+        Node* temp = new Node(x);
+        if (isEmpty()) {
+            head=tail=temp;
+        }
+        else {
+            tail->next=temp;
+            tail=temp;
+        }
+    }
+    void dequeue() {
+        if (isEmpty()) {
+            cout<<"Queue Underflow"<<endl;
+        }
+        Node* temp = head;
+        head=head->next;
+        delete temp;
+        if (head==NULL) {
+            tail=NULL;
+        }
+
+    }
+    int peek() {
+        if (isEmpty()) {
+            cout << "Queue is empty\n";
+            return -1;
+        }
+        return head->data;
+    }
+
+
+    void display() {
+        if (isEmpty()) {
+            cout << "Queue is empty\n";
+            return;
+        }
+
+        Node* temp = head;
+        while (temp != NULL) {
+            cout << temp->data<<" ";
+            temp = temp->next;
+        }
+
+    }
+};
+
+void rotate(int k,queueLinkedList q) {
+    while (k--) {
+        q.enqueue(q.peek());
+        q.dequeue();
+    }
+    q.display();
+}
+
+
+
+
+
+bool CheckIsexist(Queue q,int n) {
+    while (!q.isEmpty()) {
+        if (q.peek()==n) {
+            return true;
+        }
+        q.dequeue();
+    }
+    return false;
+
+
+}
+
+bool IsPalindrome(Queue q) {
+    string res="",res2="";
+    while (!q.isEmpty()) {
+        res+=(q.dequeue()+'0');
+    }
+    res2=res;
+    reverse(res2.begin(),res2.end());
+    if (res==res2)
+       return true;
+    return false;
+}
+
+
+
+
+signed main() {
+    fast();
+
+    queueLinkedList q;
+    q.enqueue(1);
+    q.enqueue(2);
+    q.enqueue(3);
+    q.enqueue(4);
+    q.enqueue(5);
+    rotate(2,q);
+
+}

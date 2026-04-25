@@ -1,0 +1,145 @@
+#include <bits/stdc++.h>
+#include <ctime>
+#include<ext/pb_ds/assoc_container.hpp>
+#include <bit>
+#include <cstdint>
+#include <cstdlib>
+#include <windows.h>
+#pragma warning(disable : 4996)
+#include<ext/pb_ds/assoc_container.hpp>
+using namespace __gnu_pbds;
+using namespace std;
+#define int long long
+#define endl '\n'
+typedef tree<int, null_type, less<int>, rb_tree_tag, tree_order_statistics_node_update> orderedset;
+typedef tree<int,null_type,less_equal<int>,rb_tree_tag,tree_order_statistics_node_update>orderdmultiset;
+void fast() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+}
+template<typename T>
+class Stack {
+    int top=-1;
+    int size=100;
+    T arr[100];
+
+public:
+    bool is_empty() {
+        return top==-1;
+    }
+    bool is_full() {
+        return top==size-1;
+    }
+    void push(T x) {
+        if(is_full()) {
+            cout<<"Stack Overflow"<<endl;
+            return;
+        }
+        arr[++top]=x;
+    }
+    T pop() {                         
+        if (is_empty()) {
+            cout<<"Stack Underflow"<<endl;
+            return -1;
+        }
+        return arr[top--];
+    }
+    T peek() {
+        if (is_empty()) {
+            return -1;
+        }
+        return arr[top];
+    }
+    void display() {
+        for (int i=top;i>=0;i--) {
+            cout<<arr[i]<<" ";
+        }
+        cout<<endl;
+    }
+};
+
+//Remove Duplicates from the arr
+bool IsinStack(int num,Stack<int>st) {
+    while (!st.is_empty()) {
+        if (st.pop() == num) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void removeDuplicates(int arr[], int n) {
+  Stack<int> st;
+    for (int i=0;i<n;i++) {
+        st.push(arr[i]);
+    }
+    Stack<int>res;
+    while (!st.is_empty()) {
+        if (!IsinStack(st.peek(),res)) {
+            res.push(st.pop());
+        }
+        st.pop();
+    }
+    res.display();
+}
+
+
+// Removing Stars From a String
+string non_star(string str) {
+    Stack<char> st;                    // fixed: added <char>
+
+    string res="";
+    for (char c : str) {
+        if (c != '*') {
+            st.push(c);
+        }
+        else {
+            st.pop();
+        }
+    }
+    while (!st.is_empty()) {           // fixed: was isEmpty()
+        res += st.peek();
+        st.pop();
+    }
+
+    reverse(res.begin(),res.end());
+    return res;
+}
+//Valid Parentheses
+bool isValid(string str) {
+    Stack<char> st;
+    for (char c : str) {
+        if (c == '(' || c == '{' || c == '[') {
+            st.push(c);
+        } else {
+            if (st.is_empty()) return false;
+            char top = st.pop();
+            if (c == ')' && top != '(') return false;
+            if (c == '}' && top != '{') return false;
+            if (c == ']' && top != '[') return false;
+        }
+    }
+    return st.is_empty();
+}
+
+
+//Reverse a Number Using Stack
+int reverse_num(int num) {
+    Stack<char> st;
+    while (num != 0) {
+        st.push(num % 10 + '0');
+        num /= 10;
+    }
+    int result = 0, multiplier = 1;
+    while (!st.is_empty()) {
+        result += (st.pop() - '0') * multiplier;  // fixed: build actual int
+        multiplier *= 10;
+    }
+    return result;
+}
+
+
+signed main() {
+    fast();
+    return 0;
+}
