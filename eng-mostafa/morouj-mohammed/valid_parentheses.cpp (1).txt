@@ -1,0 +1,18 @@
+#include<bits/stdc++.h>
+using namespace std;
+bool valid_parentheses(string  s) {
+    stack<char> st;
+    for (char c : s) {
+        if (!st.empty() && ((c == ')' && st.top() == '(')|| (c== ']'  && st.top() == '[') ||(c == '}'  && st.top() == '{')))
+            st.pop();
+        else
+            st.push(c);
+    }
+    return st.empty();
+}
+int main() {
+    ios_base::sync_with_stdio(0);cin.tie(0);
+    string s; cin>>s;
+    cout <<(valid_parentheses(s) ? "YES" : "NO") << endl;
+    return 0;
+}
