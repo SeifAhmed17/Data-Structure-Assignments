@@ -174,6 +174,38 @@ LinkedList<int> remove_duplicates(LinkedList<int> l) {
     return ret;
 }
 
+string infix_to_prefix(string s) {
+    reverse(s.begin(), s.end());
+    auto f = [&](char op) {
+        if (op == '^') return 2;
+        if (op == '*' || op == '/') return 1;
+        if (op == '+' || op == '-') return 0;
+        return -1;
+    };
+    string ret = "";
+    Stack<char> st;
+    for (char c : s) {
+        if (isalnum(c)) ret += c;
+        else if (c == ')') st.push(c);
+        else if (c == '(') {
+            while (!st.empty() && st.peek() != ')')
+                ret += st.peek(), st.pop();
+            st.pop();
+
+        }
+        else {
+            while (!st.empty() && st.peek() != ')' && f(st.peek()) >= f(c)) {
+                if (c == '^' && st.peek() == '^') break;
+                ret += st.peek(), st.pop();
+            }
+            st.push(c);
+        }
+    }
+    while (!st.empty()) ret += st.peek(), st.pop();
+    reverse(ret.begin(), ret.end());
+    return ret;
+}
+
 int main() {
     return 0;
 }
