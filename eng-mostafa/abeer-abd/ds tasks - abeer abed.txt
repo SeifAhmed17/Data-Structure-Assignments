@@ -1,0 +1,437 @@
+#include <iostream>
+#include <cassert>
+#include <stack>
+#include <queue>
+#include <algorithm>
+#include <cmath>
+
+using namespace std;
+
+//====================== LINKED LIST ======================//
+
+template <typename T>
+struct ListNode {
+    T data;
+    ListNode<T>* next;
+};
+
+template <typename T>
+class MyLinkedList {
+private:
+    ListNode<T>* first;
+    ListNode<T>* last;
+    int size;
+
+public:
+    MyLinkedList() : first(nullptr), last(nullptr), size(0) {}
+
+    bool empty() const {
+        return size == 0;
+    }
+
+    //------------------- Insert At End -------------------//
+    void push_back(T value) {
+        ListNode<T>* node = new ListNode<T>{value, nullptr};
+
+        if (empty())
+            first = last = node;
+        else {
+            last->next = node;
+            last = node;
+        }
+
+        size++;
+    }
+
+    //------------------- Get Nth Node -------------------//
+    ListNode<T>* getNode(int pos) {
+        if (pos < 1 || pos > size) return nullptr;
+
+        ListNode<T>* cur = first;
+        for (int i = 1; i < pos; i++)
+            cur = cur->next;
+
+        return cur;
+    }
+
+    //------------------- Print List -------------------//
+    void display() {
+        if (empty()) {
+            cout << "Empty list\n";
+            return;
+        }
+
+        ListNode<T>* cur = first;
+        while (cur) {
+            cout << cur->data << " ";
+            cur = cur->next;
+        }
+        cout << endl;
+    }
+
+    //------------------- Merge Two Sorted Lists -------------------//
+    static MyLinkedList<T> mergeSorted(MyLinkedList<T>& a, MyLinkedList<T>& b) {
+        MyLinkedList<T> result;
+
+        auto p = a.first;
+        auto q = b.first;
+
+        while (p && q) {
+            if (p->data <= q->data) {
+                result.push_back(p->data);
+                p = p->next;
+            } else {
+                result.push_back(q->data);
+                q = q->next;
+            }
+        }
+
+        while (p) {
+            result.push_back(p->data);
+            p = p->next;
+        }
+
+        while (q) {
+            result.push_back(q->data);
+            q = q->next;
+        }
+
+        return result;
+    }
+
+    //------------------- Reverse Linked List -------------------//
+    void reverseList() {
+        if (empty()) return;
+
+        ListNode<T>* prev = nullptr;
+        ListNode<T>* cur = first;
+        last = first;
+
+        while (cur) {
+            ListNode<T>* nxt = cur->next;
+            cur->next = prev;
+            prev = cur;
+            cur = nxt;
+        }
+
+        first = prev;
+    }
+
+    //------------------- Remove At Index -------------------//
+    void erase(int idx) {
+        if (empty() || idx < 0 || idx >= size) return;
+
+        if (idx == 0) {
+            auto tmp = first;
+            first = first->next;
+            delete tmp;
+            size--;
+            if (size == 0) last = nullptr;
+            return;
+        }
+
+        ListNode<T>* cur = first;
+        for (int i = 0; i < idx - 1; i++)
+            cur = cur->next;
+
+        auto del = cur->next;
+        cur->next = del->next;
+
+        if (del == last)
+            last = cur;
+
+        delete del;
+        size--;
+    }
+
+    //------------------- Remove Duplicates -------------------//
+    void removeDuplicates() {
+        if (empty()) return;
+
+        ListNode<T>* cur = first;
+
+        while (cur && cur->next) {
+            if (cur->data == cur->next->data) {
+                auto tmp = cur->next;
+                cur->next = tmp->next;
+                delete tmp;
+                size--;
+            } else {
+                cur = cur->next;
+            }
+        }
+    }
+};
+
+//====================== STACK USING ARRAY ======================//
+
+template <typename T>
+class ArrayStack {
+private:
+    int capacity;
+    int topIdx;
+    T* arr;
+
+public:
+    ArrayStack(int n) : capacity(n), topIdx(-1) {
+        arr = new T[capacity];
+    }
+
+    //------------------- Is Full -------------------//
+    bool full() const {
+        return topIdx == capacity - 1;
+    }
+
+    //------------------- Is Empty -------------------//
+    bool empty() const {
+        return topIdx == -1;
+    }
+
+    //------------------- Push -------------------//
+    void push(T val) {
+        if (!full())
+            arr[++topIdx] = val;
+    }
+
+    //------------------- Pop -------------------//
+    void pop() {
+        if (!empty())
+            topIdx--;
+    }
+
+    //------------------- Peek -------------------//
+    T top() const {
+        return empty() ? T() : arr[topIdx];
+    }
+
+    //------------------- Get Size -------------------//
+    int count() const {
+        return topIdx + 1;
+    }
+
+    ~ArrayStack() {
+        delete[] arr;
+    }
+};
+
+//------------------- Reverse Number Using Stack -------------------//
+int reverseNumber(int x) {
+    ArrayStack<int> st(100);
+
+    while (x > 0) {
+        st.push(x % 10);
+        x /= 10;
+    }
+
+    int res = 0, base = 1;
+
+    while (!st.empty()) {
+        res += st.top() * base;
+        base *= 10;
+        st.pop();
+    }
+
+    return res;
+}
+
+//------------------- Valid Parentheses -------------------//
+bool match(char a, char b) {
+    return (a=='(' && b==')') ||
+           (a=='{' && b=='}') ||
+           (a=='[' && b==']');
+}
+
+bool validBrackets(const string& s) {
+    ArrayStack<char> st(100);
+
+    for (char c : s) {
+        if (c=='(' || c=='{' || c=='[')
+            st.push(c);
+        else {
+            if (st.empty() || !match(st.top(), c))
+                return false;
+            st.pop();
+        }
+    }
+
+    return st.empty();
+}
+
+//------------------- Remove Stars From String -------------------//
+string removeStars(string s) {
+    ArrayStack<char> st(100);
+
+    for (char c : s) {
+        if (c == '*') {
+            if (!st.empty()) st.pop();
+        } else {
+            st.push(c);
+        }
+    }
+
+    string res;
+    while (!st.empty()) {
+        res = st.top() + res;
+        st.pop();
+    }
+
+    return res;
+}
+
+//====================== QUEUE USING LINKED LIST ======================//
+
+template <typename T>
+struct QNode {
+    T val;
+    QNode<T>* next;
+};
+
+template <typename T>
+class MyQueue {
+private:
+    QNode<T>* frontPtr;
+    QNode<T>* rearPtr;
+    int sz;
+
+public:
+    MyQueue() : frontPtr(nullptr), rearPtr(nullptr), sz(0) {}
+
+    //------------------- Is Empty -------------------//
+    bool empty() const {
+        return sz == 0;
+    }
+
+    //------------------- Enqueue -------------------//
+    void push(T val) {
+        QNode<T>* node = new QNode<T>{val, nullptr};
+
+        if (empty())
+            frontPtr = rearPtr = node;
+        else {
+            rearPtr->next = node;
+            rearPtr = node;
+        }
+
+        sz++;
+    }
+
+    //------------------- Dequeue -------------------//
+    void pop() {
+        assert(!empty());
+
+        auto tmp = frontPtr;
+        frontPtr = frontPtr->next;
+        delete tmp;
+
+        if (!frontPtr) rearPtr = nullptr;
+
+        sz--;
+    }
+
+    //------------------- Get Front -------------------//
+    T front() const {
+        return frontPtr->val;
+    }
+
+    //------------------- Check If Number Exists -------------------//
+    bool contains(T x) {
+        auto cur = frontPtr;
+        while (cur) {
+            if (cur->val == x) return true;
+            cur = cur->next;
+        }
+        return false;
+    }
+
+    //------------------- Rotate By K Positions -------------------//
+    void rotate(int k) {
+        if (empty() || k % sz == 0) return;
+
+        k %= sz;
+        while (k--) {
+            auto tmp = frontPtr;
+            frontPtr = frontPtr->next;
+            rearPtr->next = tmp;
+            tmp->next = nullptr;
+            rearPtr = tmp;
+        }
+    }
+};
+
+//------------------- Check Palindrome -------------------//
+bool isPalindrome(queue<int> q) {
+    stack<int> s;
+    queue<int> temp = q;
+
+    while (!temp.empty()) {
+        s.push(temp.front());
+        temp.pop();
+    }
+
+    while (!q.empty()) {
+        if (q.front() != s.top())
+            return false;
+        q.pop();
+        s.pop();
+    }
+
+    return true;
+}
+
+//====================== INFIX TO PREFIX ======================//
+
+bool isOp(char c) {
+    return c=='+'||c=='-'||c=='*'||c=='/'||c=='^';
+}
+
+int prec(char c) {
+    if (c=='+'||c=='-') return 1;
+    if (c=='*'||c=='/') return 2;
+    if (c=='^') return 3;
+    return 0;
+}
+
+//------------------- Infix To Prefix -------------------//
+string toPrefix(string exp) {
+    reverse(exp.begin(), exp.end());
+
+    for (char &c : exp) {
+        if (c=='(') c=')';
+        else if (c==')') c='(';
+    }
+
+    stack<char> st;
+    string res;
+
+    for (char c : exp) {
+        if (isdigit(c))
+            res += c;
+
+        else if (c=='(')
+            st.push(c);
+
+        else if (c==')') {
+            while (!st.empty() && st.top()!='(') {
+                res += st.top();
+                st.pop();
+            }
+            st.pop();
+        }
+
+        else {
+            while (!st.empty() && prec(st.top()) > prec(c)) {
+                res += st.top();
+                st.pop();
+            }
+            st.push(c);
+        }
+    }
+
+    while (!st.empty()) {
+        res += st.top();
+        st.pop();
+    }
+
+    reverse(res.begin(), res.end());
+    return res;
+}

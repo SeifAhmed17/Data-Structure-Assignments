@@ -1,0 +1,307 @@
+#include <iostream>
+#include <stack>
+#include <queue>
+#include <cassert>
+#include <algorithm>
+#include <cmath>
+
+using namespace std;
+
+//////////////////////////////////////////////////////////////////
+//====================== LINKED LIST ==========================//
+//////////////////////////////////////////////////////////////////
+
+template <typename T>
+struct Node {
+    T data;
+    Node<T>* next;
+};
+
+template <typename T>
+class LinkedList {
+private:
+    Node<T>* head;
+    Node<T>* tail;
+    int size;
+
+public:
+    LinkedList() : head(nullptr), tail(nullptr), size(0) {}
+
+    bool empty() { return size == 0; }
+
+    //---------------- Insert at end ----------------//
+    void add(T val) {
+        Node<T>* n = new Node<T>{val, nullptr};
+
+        if (empty()) head = tail = n;
+        else {
+            tail->next = n;
+            tail = n;
+        }
+        size++;
+    }
+
+    //---------------- Print (for loop style) ----------------//
+    void print() {
+        Node<T>* cur = head;
+        for (int i = 0; i < size; i++) {
+            cout << cur->data << " ";
+            cur = cur->next;
+        }
+        cout << endl;
+    }
+
+    //---------------- Get nth node ----------------//
+    Node<T>* getNode(int n) {
+        if (n < 1 || n > size) return nullptr;
+
+        Node<T>* cur = head;
+        for (int i = 1; i < n; i++)
+            cur = cur->next;
+
+        return cur;
+    }
+
+    //---------------- Reverse list ----------------//
+    void reverse() {
+        Node<T>* prev = nullptr;
+        Node<T>* cur = head;
+        tail = head;
+
+        while (cur) {
+            Node<T>* nxt = cur->next;
+            cur->next = prev;
+            prev = cur;
+            cur = nxt;
+        }
+
+        head = prev;
+    }
+
+    //---------------- Remove index ----------------//
+    void remove(int idx) {
+        if (idx < 0 || idx >= size) return;
+
+        if (idx == 0) {
+            Node<T>* tmp = head;
+            head = head->next;
+            delete tmp;
+            size--;
+            return;
+        }
+
+        Node<T>* cur = head;
+        for (int i = 0; i < idx - 1; i++)
+            cur = cur->next;
+
+        Node<T>* del = cur->next;
+        cur->next = del->next;
+        delete del;
+        size--;
+    }
+};
+
+//////////////////////////////////////////////////////////////////
+//====================== STACK ================================//
+//////////////////////////////////////////////////////////////////
+
+template <typename T>
+class StackArr {
+private:
+    T arr[100];
+    int top;
+
+public:
+    StackArr() { top = -1; }
+
+    bool empty() { return top == -1; }
+
+    void push(T x) { arr[++top] = x; }
+
+    void pop() { if (!empty()) top--; }
+
+    T peek() { return arr[top]; }
+};
+
+//////////////////////////////////////////////////////////////////
+//====================== QUEUE ================================//
+//////////////////////////////////////////////////////////////////
+
+class Queue {
+private:
+    queue<int> q;
+
+public:
+    void enqueue(int x) { q.push(x); }
+
+    void dequeue() { q.pop(); }
+
+    bool contains(int x) {
+        queue<int> temp = q;
+        while (!temp.empty()) {
+            if (temp.front() == x) return true;
+            temp.pop();
+        }
+        return false;
+    }
+
+    void rotate(int k) {
+        int n = q.size();
+        if (n == 0) return;
+
+        k %= n;
+        while (k--) {
+            int x = q.front();
+            q.pop();
+            q.push(x);
+        }
+    }
+
+    bool palindrome() {
+        stack<int> s;
+        queue<int> temp = q;
+
+        while (!temp.empty()) {
+            s.push(temp.front());
+            temp.pop();
+        }
+
+        temp = q;
+
+        while (!temp.empty()) {
+            if (temp.front() != s.top())
+                return false;
+            temp.pop();
+            s.pop();
+        }
+        return true;
+    }
+
+    void display() {
+        queue<int> temp = q;
+        while (!temp.empty()) {
+            cout << temp.front() << " ";
+            temp.pop();
+        }
+        cout << endl;
+    }
+};
+
+//////////////////////////////////////////////////////////////////
+//====================== TASK FUNCTIONS =======================//
+//////////////////////////////////////////////////////////////////
+
+// Reverse number using stack
+int reverseNumber(int n) {
+    StackArr<int> s;
+
+    while (n) {
+        s.push(n % 10);
+        n /= 10;
+    }
+
+    int res = 0, mul = 1;
+
+    while (!s.empty()) {
+        res = res * 10 + s.peek();
+        s.pop();
+    }
+
+    return res;
+}
+
+// Valid parentheses
+bool valid(string s) {
+    StackArr<char> st;
+
+    for (char c : s) {
+        if (c=='(' || c=='{' || c=='[')
+            st.push(c);
+        else {
+            if (st.empty()) return false;
+
+            char t = st.peek();
+            st.pop();
+
+            if ((c==')' && t!='(') ||
+                (c=='}' && t!='{') ||
+                (c==']' && t!='['))
+                return false;
+        }
+    }
+
+    return st.empty();
+}
+
+// Remove stars
+string removeStars(string s) {
+    StackArr<char> st;
+
+    for (char c : s) {
+        if (c == '*') {
+            if (!st.empty()) st.pop();
+        } else {
+            st.push(c);
+        }
+    }
+
+    string res = "";
+    while (!st.empty()) {
+        res = st.peek() + res;
+        st.pop();
+    }
+
+    return res;
+}
+
+//////////////////////////////////////////////////////////////////
+//====================== MAIN ================================//
+//////////////////////////////////////////////////////////////////
+
+int main() {
+
+    //================ Linked List =================//
+    LinkedList<int> l;
+    l.add(1);
+    l.add(2);
+    l.add(3);
+    l.add(4);
+    l.print();
+
+    cout << "Get 3rd: " << l.getNode(3)->data << endl;
+
+    l.reverse();
+    l.print();
+
+    l.remove(1);
+    l.print();
+
+    cout << "====================\n";
+
+    //================ Stack Tasks =================//
+    cout << reverseNumber(1234) << endl;
+
+    cout << valid("(){}[]") << endl;
+
+    cout << removeStars("leet**code") << endl;
+
+    cout << "====================\n";
+
+    //================ Queue Tasks =================//
+    Queue q;
+    q.enqueue(1);
+    q.enqueue(2);
+    q.enqueue(3);
+    q.enqueue(4);
+
+    q.display();
+
+    cout << q.contains(3) << endl;
+
+    q.rotate(2);
+    q.display();
+
+    cout << q.palindrome() << endl;
+
+    return 0;
+}
