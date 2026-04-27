@@ -1,0 +1,319 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+
+    Node(int value) : data(value), next(nullptr) {}
+};
+
+// ===================== SINGLY LINKED LIST =====================
+class LinkedList {
+private:
+    Node* head;
+    Node* tail;
+    int size;
+
+public:
+    LinkedList(int value) {
+        head = new Node(value);
+        tail = head;
+        size = 1;
+    }
+    void append(int value) {
+        Node* newNode = new Node(value);
+        tail->next = newNode;
+        tail = newNode;
+        size++;
+    }
+
+    Node* getNodeAt(int index) {
+        if (index <= 0 || index > size) return nullptr;
+
+        Node* current = head;
+        while (--index) {
+            current = current->next;
+        }
+        return current;
+    }
+
+    static Node* mergeSorted(Node* a, Node* b) {
+        Node dummy(0);
+        Node* current = &dummy;
+
+        while (a && b) {
+            if (a->data < b->data) {
+                current->next = a;
+                a = a->next;
+            } else {
+                current->next = b;
+                b = b->next;
+            }
+            current = current->next;
+        }
+
+        current->next = (a ? a : b);
+        return dummy.next;
+    }
+
+    // Reverse linked list iteratively
+    static Node* reverse(Node* head) {
+        Node* prev = nullptr;
+
+        while (head) {
+            Node* nextNode = head->next;
+            head->next = prev;
+            prev = head;
+            head = nextNode;
+        }
+
+        return prev;
+    }
+
+    // Delete node at given position
+    static Node* deleteAtPosition(Node* head, int position) {
+        if (!head) return nullptr;
+
+        if (position == 0) {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+            return head;
+        }
+
+        Node* current = head;
+
+        for (int i = 0; i < position - 1 && current->next; i++) {
+            current = current->next;
+        }
+
+        if (!current->next) return head;
+
+        Node* temp = current->next;
+        current->next = temp->next;
+        delete temp;
+
+        return head;
+    }
+};
+
+// ===================== FIXED SIZE STACK =====================
+const int MAX_SIZE = 1000;
+
+class Stack {
+private:
+    int arr[MAX_SIZE];
+    int topIndex;
+
+public:
+    Stack() : topIndex(-1) {}
+
+    bool empty() {
+        return topIndex == -1;
+    }
+
+    void push(int value) {
+        if (topIndex < MAX_SIZE - 1)
+            arr[++topIndex] = value;
+    }
+
+    int pop() {
+        if (empty()) return -1;
+        return arr[topIndex--];
+    }
+
+    int top() {
+        return empty() ? -1 : arr[topIndex];
+    }
+
+    // Reverse digits of a number
+    int reverseNumber(int number) {
+        int result = 0;
+
+        while (number > 0) {
+            result = result * 10 + number % 10;
+            number /= 10;
+        }
+
+        return result;
+    }
+
+    // Validate parentheses expression
+    bool isBalanced(string expression) {
+        Stack helper;
+
+        for (char ch : expression) {
+            if (ch == '(' || ch == '{' || ch == '[') {
+                helper.push(ch);
+            } else {
+                if (helper.empty()) return false;
+
+                char topChar = helper.top();
+
+                if ((ch == ')' && topChar != '(') ||
+                    (ch == '}' && topChar != '{') ||
+                    (ch == ']' && topChar != '['))
+                    return false;
+
+                helper.pop();
+            }
+        }
+
+        return helper.empty();
+    }
+
+    // Remove stars using string as dynamic stack
+    string processStars(string input) {
+        string result;
+
+        for (char ch : input) {
+            if (ch == '*') {
+                if (!result.empty())
+                    result.pop_back();
+            } else {
+                result.push_back(ch);
+            }
+        }
+
+        return result;
+    }
+};
+
+// ===================== QUEUE USING STACKS =====================
+class QueueUsingStacks {
+private:
+    Stack inputStack, outputStack;
+
+public:
+    bool isEmpty() {
+        return inputStack.empty() && outputStack.empty();
+    }
+
+    void enqueue(int value) {
+        inputStack.push(value);
+    }
+
+    int dequeue() {
+        if (isEmpty()) return -1;
+
+        if (outputStack.empty()) {
+            while (!inputStack.empty())
+                outputStack.push(inputStack.pop());
+        }
+
+        return outputStack.pop();
+    }
+
+    void printQueue() {
+        QueueUsingStacks temp = *this;
+
+        while (!temp.isEmpty()) {
+            cout << temp.dequeue() << " ";
+        }
+    }
+};
+
+// Check existence in queue
+bool contains(QueueUsingStacks q, int value) {
+    while (!q.isEmpty()) {
+        if (q.dequeue() == value)
+            return true;
+    }
+    return false;
+}
+
+// Check palindrome in queue
+bool checkPalindrome(QueueUsingStacks q) {
+    vector<int> data;
+
+    while (!q.isEmpty())
+        data.push_back(q.dequeue());
+
+    int n = data.size();
+
+    for (int i = 0; i < n / 2; i++) {
+        if (data[i] != data[n - i - 1])
+            return false;
+    }
+
+    return true;
+}
+
+// ===================== LINKED QUEUE IMPLEMENTATION =====================
+class Queue {
+private:
+    struct NodeQ {
+        int data;
+        NodeQ* next;
+
+        NodeQ(int value) : data(value), next(nullptr) {}
+    };
+
+    NodeQ *front, *rear;
+
+public:
+    Queue() : front(nullptr), rear(nullptr) {}
+
+    void enqueue(int value) {
+        NodeQ* node = new NodeQ(value);
+
+        if (!rear) {
+            front = rear = node;
+        } else {
+            rear->next = node;
+            rear = node;
+        }
+    }
+
+    int dequeue() {
+        if (!front) return -1;
+
+        int value = front->data;
+        NodeQ* temp = front;
+
+        front = front->next;
+
+        if (!front) rear = nullptr;
+
+        delete temp;
+        return value;
+    }
+
+    bool isEmpty() {
+        return front == nullptr;
+    }
+
+    void rotateQueue(int k) {
+        while (k-- && front) {
+            enqueue(dequeue());
+        }
+    }
+};
+
+// ===================== ARRAY PROCESSING TASK =====================
+void processArrayTask() {
+    int arr[] = {1, 1, 2, 3, 3, 6};
+    int n = 6;
+
+    int result[1000];
+    int index = 0;
+
+    result[index++] = arr[0];
+
+    for (int i = 1; i < n; i++) {
+        if (arr[i] != arr[i - 1]) {
+            result[index++] = arr[i];
+        }
+    }
+
+    for (int i = 0; i < index; i++) {
+        cout << result[i] << " ";
+    }
+}
+
+int main() {
+}
