@@ -1,0 +1,41 @@
+#include <iostream>
+using namespace std;
+
+struct Node{
+    int data;
+    Node* next;
+};
+
+Node* get_nth(Node* head,int n)
+{
+    int count = 1;
+    Node* temp = head;
+
+    while(temp != NULL)
+    {
+        if(count == n)
+            return temp;
+
+        temp = temp->next;
+        count++;
+    }
+
+    return NULL;
+}
+
+int main()
+{
+    Node* head = new Node{6,NULL};
+    head->next = new Node{10,NULL};
+    head->next->next = new Node{8,NULL};
+    head->next->next->next = new Node{15,NULL};
+
+    Node* result = get_nth(head,4);
+
+    if(result != NULL)
+        cout << result->data;
+    else
+        cout << "Not Found";
+
+    return 0;
+}
